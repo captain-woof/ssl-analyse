@@ -47,7 +47,7 @@ def processScanResult(result: ServerScanResult):
 
     # 1. Certificate Trust and Validity
     try:
-        if result.scan_result is None:
+        if result.scan_result is None or result.scan_result.certificate_info is None or result.scan_result.certificate_info.result is None:
             return ("error", scanTarget, f"{scanTarget}, ERROR, scan_result is None")
 
         for certificate in result.scan_result.certificate_info.result.certificate_deployments:
