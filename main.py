@@ -5,6 +5,7 @@ from sslyze import ServerNetworkLocation, ServerScanRequest, ServerScanResult, S
 from sslyze.scanner.scanner import Scanner
 from os import path, mkdir
 import datetime
+import traceback
 
 def parseTargetString(targetStr):
     """
@@ -46,6 +47,9 @@ def processScanResult(result: ServerScanResult):
 
     # 1. Certificate Trust and Validity
     try:
+        if result.scan_result is None:
+            return 
+
         for certificate in result.scan_result.certificate_info.result.certificate_deployments:
             for validationResult in certificate.path_validation_results:
                 if validationResult.was_validation_successful:
@@ -104,7 +108,8 @@ def processScanResult(result: ServerScanResult):
             return ("invalid", scanTarget, f"{scanTarget}, INVALID, Issues:{failures}")
         
     except Exception as e:
-        return ("error", scanTarget, f"{scanTarget}, ERROR, {e.with_traceback()}")
+        traceback.print_exc() # Prints stack trace
+        return ("error", scanTarget, f"{scanTarget}, ERROR, {type(e).__name__}: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description="A multi-threaded, exhaustive TLS/SSL scanner with consistent port output.")
